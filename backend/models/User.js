@@ -11,6 +11,13 @@ const userSchema = new mongoose.Schema({
   profilePicture: { type: String },
   solutions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Solution' }], // Fixed typo: 'types' -> 'type'
   problems: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Problem' }], // Added field for problems
+  createdProjects: [
+    {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Project'
+    }
+],
+  contributedProjects: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Project' }] // Projects the user contributed to
 });
 
 // Optional: Add index for performance
