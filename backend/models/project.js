@@ -5,6 +5,7 @@ const projectSchema=new mongoose.Schema({
     technologies:[String],
     createdBy:{type:mongoose.Schema.Types.ObjectId,ref:'User',required:true},
     collaborators:[{ type: mongoose.Schema.Types.ObjectId, ref:'User'}],
+    githubLink: { type: String },
     createdAt:{type:Date , default:Date.now }
 });
 

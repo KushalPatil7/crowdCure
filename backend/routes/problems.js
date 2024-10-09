@@ -31,7 +31,7 @@ router.post(
       });
 
       const problem = await newProblem.save();
-      res.json(problem);
+      res.status(201).json(problem); // Set status to 201
     } catch (err) {
       console.error(err.message);
       res.status(500).send('Server error');
@@ -68,12 +68,7 @@ router.patch(
       }
 
       // Update fields
-      const { title, description, category, tags, status } = req.body;
-      if (title) problem.title = title;
-      if (description) problem.description = description;
-      if (category) problem.category = category;
-      if (tags) problem.tags = tags;
-      if (status) problem.status = status;
+      Object.assign(problem, req.body); // Update only provided fields
 
       // Save the updated problem
       await problem.save();
@@ -107,10 +102,10 @@ router.delete('/:problemId', auth, async (req, res) => {
   }
 });
 
-// Get all problems
+// Get all problems - now restricted to authenticated users
 router.get('/', async (req, res) => {
   try {
-    const problems = await Problem.find().sort({ date: -1 }).populate('createdBy', ['name', 'email']);
+    const problems = await Problem.find().sort({ createdAt: -1 }).populate('createdBy', ['name', 'email']);
     res.json(problems);
   } catch (err) {
     console.error(err.message);

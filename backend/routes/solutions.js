@@ -3,7 +3,7 @@ import { check, validationResult } from 'express-validator';
 import auth from '../middleware/auth.js';
 import Problem from '../models/Problem.js';
 import Solution from '../models/Solution.js';
-
+import mongoose from 'mongoose';
 
 const router = express.Router();
 
@@ -11,12 +11,23 @@ const router = express.Router();
 // @desc    Create a new solution
 // @access  Private
 
-// GET ALL SOLUTIONS
-router.get('/:problemId', async (req, res) => {
+// Get all solutions for a specific problem
+router.get('/:problemId', auth, async (req, res) => {
+  const { problemId } = req.params;
+
+  // Validate ObjectId
+  if (!mongoose.Types.ObjectId.isValid(problemId)) {
+    return res.status(400).json({ msg: 'Invalid Problem ID' });
+  }
+
   try {
-    const solutions = await Solution.find({ problemId: req.params.problemId })
+    const solutions = await Solution.find({ problemId })
       .populate('createdBy', ['name', 'email'])
       .sort({ createdAt: -1 });
+
+    if (!solutions.length) {
+      return res.status(404).json({ msg: 'No solutions found for this problem' });
+    }
 
     res.json(solutions);
   } catch (error) {
@@ -24,52 +35,6 @@ router.get('/:problemId', async (req, res) => {
     res.status(500).send('Server error');
   }
 });
-
-
-// POST  A SOLUTION
-router.post(
-  '/',
-  [
-    auth,
-    [
-      check('problemId', 'Problem ID is required').not().isEmpty(),
-      check('solutionDescription', 'Solution description is required').not().isEmpty(),
-    ],
-  ],
-  async (req, res) => {
-    const errors = validationResult(req);
-    const { problemId, solutionDescription } = req.body;
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    try {
-      const problem = await Problem.findById(problemId);
-      if (!problem) {
-        return res.status(404).json({ msg: 'Problem not found' });
-      }
-
-      const newSolution = new Solution({
-        problemId,
-        solutionDescription,
-        createdBy: req.user.id,
-      });
-
-      const solution = await newSolution.save();
-      res.json(solution);
-    } catch (error) {
-      console.error(error.message);
-      res.status(500).send('Server error');
-    }
-  }
-);
-
-// @route   GET /api/solutions/:problemId
-// @desc    Get all solutions for a specific problem
-// @access  Public
-
-
-
 // UPDATE SOLUTION
 router.patch('/:solutionId'
 ,auth,
