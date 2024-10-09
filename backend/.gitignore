@@ -1,1 +1,5 @@
 .env
+/config/
+security_key_file.json
+token.json
+credentials.json
