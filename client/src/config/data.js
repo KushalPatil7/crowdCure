@@ -31,6 +31,38 @@ export const NavbarMenu = [
   },
 ];
 
+export const SideBarMenu = [
+  {
+    id: 1,
+    title: "Ask a Question",
+    link: "/question",
+  },
+  {
+    id: 2,
+    title: "Room",
+    link: "/room",
+  },
+  {
+    id: 3,
+    title: "Chat",
+    link: "/chat",
+  },
+  {
+    id: 4,
+    title: "Payments",
+    link: "/pricing",
+  },
+  {
+    id: 5,
+    title: "Projects",
+    link: "projects",
+  },
+  {
+    id: 6,
+    title: "Profile",
+    link: "/profile",
+  },
+];
 
 export const Categories = [
   { id: "web-development", label: "Web Development" },

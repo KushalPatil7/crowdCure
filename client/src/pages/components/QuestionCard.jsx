@@ -75,7 +75,7 @@ const QuestionCard = ({ question, setShowModal }) => {
      <div className="flex justify-between items-center">
        <button
          type="button"
-         className="bg-yellow-400 text-white py-2 px-4 rounded-md flex items-center hover:bg-yellow-700 transition-all duration-300"
+         className="bg-blue-400 text-white py-2 px-4 rounded-md flex items-center hover:bg-blue-800 transition-all duration-300"
        >
          <FaThumbsUp className="mr-2" /> Upvote
        </button>
