@@ -13,11 +13,6 @@ import cors from 'cors'
 // Load environment variables
 dotenv.config();
 
-// Connect to MongoDB
-mongoose
-  .connect(MONGO_URI)
-  .then(() => console.log("mongodb is connected"))
-  .catch((e) => console.log(e));
 
 
 const app = express();
