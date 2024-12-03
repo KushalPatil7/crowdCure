@@ -1,5 +1,6 @@
 import React from "react";
 import SearchBar from "./components/SearchBar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import QuestionCard from "./components/QuestionCard";
 import UserAnswer from "./components/UserAnswer";
 import { SampleQuestionData } from "../config/data";
@@ -30,32 +31,42 @@ const Profile = () => {
 
         {/* Lower part of column (Content Sections) */}
         <div className="w-full flex flex-col gap-10 lg:flex-row lg:gap-16">
-          {/* Questions Section */}
-          <div className="flex-1 border rounded-lg bg-white shadow-md p-6">
-            <h3 className="text-2xl font-semibold text-gray-800 mb-6">
-              Questions
-            </h3>
-            <SearchBar />
-            <div className="mt-6 space-y-6">
-              {/* Iterate over initialQuestionData and render a QuestionCard for each */}
-              {SampleQuestionData.map((question, index) => (
-                <QuestionCard key={index} question={question} />
-              ))}
-            </div>
-          </div>
+          <Tabs defaultValue="Questions">
+            <TabsList>
+              <TabsTrigger value="Questions">Questions</TabsTrigger>
+              <TabsTrigger value="Answers">Answers</TabsTrigger>
+            </TabsList>
 
-          {/* Answers Section */}
-          <div className="flex-1 border rounded-lg bg-white shadow-md p-6">
-            <h3 className="text-2xl font-semibold text-gray-800 mb-6">
-              Answers
-            </h3>
-            <SearchBar />
-            <div className="mt-6 space-y-6">
-              <UserAnswer />
-              <UserAnswer />
-              <UserAnswer />
-            </div>
-          </div>
+            <TabsContent value="Questions">
+              <div className="flex-1 border rounded-lg shadow-md p-6">
+                <h3 className="text-2xl font-semibold text-gray-800 mb-6">
+                  Questions
+                </h3>
+                <SearchBar />
+                <div className="mt-6 space-y-6">
+                  {SampleQuestionData.map((question, index) => (
+                    <QuestionCard key={index} question={question} />
+                  ))}
+                </div>
+              </div>
+            </TabsContent>
+            <TabsContent value="Answers">
+              <div className="flex-1 border rounded-lg shadow-md p-6">
+                <h3 className="text-2xl font-semibold text-gray-800 mb-6">
+                  Answers
+                </h3>
+                <SearchBar />
+                <div className="mt-6 space-y-6">
+                  <div className="flex flex-col space-y-4">
+                  
+                    <UserAnswer />
+                    <UserAnswer />
+                    <UserAnswer />
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>

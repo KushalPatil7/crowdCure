@@ -4,6 +4,7 @@ import { MdOutlineMenu } from "react-icons/md";
 import { FaChevronDown } from "react-icons/fa";
 import { NavbarMenu } from "../config/data";
 import SearchBar from "./components/SearchBar";
+import { Button } from "@/components/ui/button";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -59,10 +60,10 @@ const Navbar = () => {
           </button>
 
           {/* Login Dropdown for larger screens */}
-          <button className="inline-flex items-center text-gray-700 hover:text-blue-500 hover:ring-2 hover:ring-blue-300 p-2 rounded-md hidden md:flex">
+          <Button className="inline-flex items-center text-gray-700 hover:text-blue-500 hover:ring-2 hover:ring-blue-300 p-2 rounded-md hidden md:flex">
             Login
             <FaChevronDown className="ml-2 text-sm" />
-          </button>
+          </Button>
         </div>
       </div>
 
