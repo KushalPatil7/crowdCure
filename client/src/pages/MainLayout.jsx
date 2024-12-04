@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/resizable";
 import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
+import LeftSideBar from "./LeftSideBar";
 
 const MainLayout = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -19,29 +20,36 @@ const MainLayout = () => {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
   return (
     <>
       <Navbar />
-      <ResizablePanelGroup
-        direction="horizontal"
-        className="flex-1 flex h-full overflow-hidden p-2"
-      >
-        {/* Left  */}
-        <ResizablePanel
-          defaultSize={10}
-          minSize={isMobile ? 0 : 5}
-          maxSize={10}
+      <div className="flex h-full">
+        <ResizablePanelGroup
+          direction="horizontal"
+          className="flex-1 h-full overflow-hidden bg-gradient-to-b from-blue-50 to-white"
         >
-          L
-        </ResizablePanel>
-        <ResizableHandle className="w-[2px] bg-gray-300 rounded-lg transition-colors" />
+          {/* Left Sidebar */}
+          <ResizablePanel
+            defaultSize={13}
+            minSize={isMobile ? 0 : 0}
+            maxSize={13}
+            className="bg-gray-50 overflow-auto"
+          >
+            <LeftSideBar />
+          </ResizablePanel>
 
-        <ResizablePanel defaultSize={isMobile ? 80 : 60}>
-      
+          <ResizableHandle className="w-[2px] rounded-lg cursor-col-resize" />
+
+          {/* Main Content */}
+          <ResizablePanel
+            defaultSize={isMobile ? 80 : 60}
+            className="overflow-auto"
+          >
             <Outlet />
-         
-        </ResizablePanel>
-      </ResizablePanelGroup>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </div>
     </>
   );
 };

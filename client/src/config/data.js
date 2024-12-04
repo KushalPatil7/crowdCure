@@ -1,33 +1,39 @@
+import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
+import { FaRegUser, FaUser } from "react-icons/fa";
+import {  BsPatchQuestion } from "react-icons/bs";
+import {  PiUsersThreeLight } from "react-icons/pi";
+import { MdPayment } from "react-icons/md";
 export const NavbarMenu = [
   {
     id: 1,
     title: "Ask a Question",
     link: "/question",
+    icon: BsPatchQuestion,
   },
   {
     id: 2,
     title: "Room",
     link: "/room",
+    icon: PiUsersThreeLight,
   },
   {
     id: 3,
     title: "Chat",
     link: "/chat",
+    icon: IoChatbubbleEllipsesOutline,
   },
   {
     id: 4,
     title: "Payments",
     link: "/pricing",
+    icon: MdPayment,
   },
+
   {
     id: 5,
-    title: "Projects",
-    link: "projects",
-  },
-  {
-    id: 6,
     title: "Profile",
     link: "/profile",
+    icon: FaRegUser,
   },
 ];
 
@@ -52,13 +58,9 @@ export const SideBarMenu = [
     title: "Payments",
     link: "/pricing",
   },
+ 
   {
     id: 5,
-    title: "Projects",
-    link: "projects",
-  },
-  {
-    id: 6,
     title: "Profile",
     link: "/profile",
   },
@@ -105,7 +107,6 @@ export const developmentLanguages = [
   { id: "angular", label: "Angular" },
   { id: "flutter", label: "Flutter" },
   { id: "react_native", label: "React Native" },
-
 ];
 
 export const qaFormControls = [
@@ -175,8 +176,8 @@ export const SampleQuestionData = [
       "I'm trying to build a responsive navbar in React, but I'm having trouble making it adapt to different screen sizes. What is the best way to implement a responsive navbar using React?",
     category: "Web Development",
     tags: ["React", "JavaScript", "CSS", "Frontend"],
-    attachments: [], 
-    comment: "", 
+    attachments: [],
+    comment: "",
   },
   {
     title: "What is the difference between var, let, and const in JavaScript?",
@@ -184,10 +185,7 @@ export const SampleQuestionData = [
       "I understand that var, let, and const are used for variable declarations in JavaScript, but I am confused about the differences between them. Could someone explain when to use each one?",
     category: "JavaScript",
     tags: ["JavaScript", "Programming", "Variables"],
-    attachments:[],
-    comment: "", 
+    attachments: [],
+    comment: "",
   },
-  
- 
- 
 ];
