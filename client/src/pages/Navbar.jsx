@@ -60,7 +60,7 @@ const Navbar = () => {
           </button>
 
           {/* Login Dropdown for larger screens */}
-          <Button className="inline-flex items-center text-gray-700 hover:text-blue-500 hover:ring-2 hover:ring-blue-300 p-2 rounded-md hidden md:flex">
+          <Button className=" items-center text-gray-700 hover:text-blue-500 hover:ring-2 hover:ring-blue-300 p-2 rounded-md hidden md:flex">
             Login
             <FaChevronDown className="ml-2 text-sm" />
           </Button>

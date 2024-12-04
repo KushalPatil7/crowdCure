@@ -5,8 +5,10 @@ import express from 'express';
 
 // Define the scopes required for the Google Calendar API
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
-const CREDENTIALS_PATH = path.resolve('C:/Users/kusha/Documents/Projects/crowdCure/credentials.json');
-const TOKEN_PATH = path.resolve('C:/Users/kusha/Documents/Projects/crowdCure/token.json');
+const CREDENTIALS_PATH = path.resolve("./credentials.json");
+const TOKEN_PATH = path.resolve(
+  "./token.json"
+);
 
 const router = express.Router();
 
