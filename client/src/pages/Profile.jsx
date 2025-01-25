@@ -31,10 +31,20 @@ const Profile = () => {
 
         {/* Lower part of column (Content Sections) */}
         <div className="w-full flex flex-col gap-10 lg:flex-row lg:gap-16">
-          <Tabs defaultValue="Questions">
-            <TabsList>
-              <TabsTrigger value="Questions">Questions</TabsTrigger>
-              <TabsTrigger value="Answers">Answers</TabsTrigger>
+          <Tabs defaultValue="Questions" className="w-full">
+            <TabsList className="flex mb-4 gap-4" >
+              <TabsTrigger
+                value="Questions"
+                className="text-lg font-semibold py-2 px-4 rounded-t-lg hover:bg-blue-500 hover:text-white focus:outline-none transition-all duration-300 ease-in-out"
+              >
+                Questions
+              </TabsTrigger>
+              <TabsTrigger
+                value="Answers"
+                className="text-lg font-semibold py-2 px-4 rounded-t-lg hover:bg-blue-500 hover:text-white focus:outline-none transition-all duration-300 ease-in-out"
+              >
+                Answers
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="Questions">
@@ -50,6 +60,7 @@ const Profile = () => {
                 </div>
               </div>
             </TabsContent>
+
             <TabsContent value="Answers">
               <div className="flex-1 border rounded-lg shadow-md p-6">
                 <h3 className="text-2xl font-semibold text-gray-800 mb-6">
@@ -58,7 +69,6 @@ const Profile = () => {
                 <SearchBar />
                 <div className="mt-6 space-y-6">
                   <div className="flex flex-col space-y-4">
-                  
                     <UserAnswer />
                     <UserAnswer />
                     <UserAnswer />

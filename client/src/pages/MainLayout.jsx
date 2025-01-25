@@ -7,6 +7,7 @@ import {
 import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import LeftSideBar from "./LeftSideBar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const MainLayout = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -24,7 +25,7 @@ const MainLayout = () => {
   return (
     <>
       <Navbar />
-      <div className="flex h-full">
+      <div className="flex h-[calc(100vh-60px)]">
         <ResizablePanelGroup
           direction="horizontal"
           className="flex-1 h-full overflow-hidden bg-gradient-to-b from-blue-50 to-white"
@@ -39,14 +40,16 @@ const MainLayout = () => {
             <LeftSideBar />
           </ResizablePanel>
 
-          <ResizableHandle className="w-[2px] rounded-lg cursor-col-resize" />
+          <ResizableHandle className="w-[2px] rounded-lg cursor-col-resize  bg-gray-300" />
 
           {/* Main Content */}
           <ResizablePanel
             defaultSize={isMobile ? 80 : 60}
             className="overflow-auto"
           >
-            <Outlet />
+            <ScrollArea className="h-full w-full rounded-md border p-4">
+              <Outlet />
+            </ScrollArea>
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>

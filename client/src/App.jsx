@@ -1,7 +1,7 @@
 import Home from "./pages/Home";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import AskQuestion from "./pages/AskQuestion";
+import QuestionContainer from "./pages/QuestionContainer";
 import Profile from "./pages/Profile";
 import Room from "./pages/Room";
 import Chat from "./pages/Chat";
@@ -12,9 +12,9 @@ export default function App() {
     <Router>
       <>
         <Routes>
-          <Route  element={<MainLayout />}>
+          <Route element={<MainLayout />}>
             <Route path="/" element={<Home />} />
-            <Route path="/question" element={<AskQuestion />} />
+            <Route path="/question" element={<QuestionContainer />} />
             <Route path="/room" element={<Room />} />
             <Route path="/chat" element={<Chat />} />
             <Route path="/pricing" element={<Payments />} />

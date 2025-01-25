@@ -1,7 +1,7 @@
 import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 import { FaRegUser, FaUser } from "react-icons/fa";
-import {  BsPatchQuestion } from "react-icons/bs";
-import {  PiUsersThreeLight } from "react-icons/pi";
+import { BsPatchQuestion } from "react-icons/bs";
+import { PiUsersThreeLight } from "react-icons/pi";
 import { MdPayment } from "react-icons/md";
 export const NavbarMenu = [
   {
@@ -58,7 +58,7 @@ export const SideBarMenu = [
     title: "Payments",
     link: "/pricing",
   },
- 
+
   {
     id: 5,
     title: "Profile",
@@ -130,23 +130,24 @@ export const qaFormControls = [
     name: "category",
     label: "Category",
     placeholder: "Select a category",
-    type: "text",
-    componentType: "input", // Could be a dropdown or select component
+    type: "select",
+    componentType: "select",
+    required: true,
   },
   {
     name: "tags",
     label: "Tags",
     placeholder: "Add relevant tags (e.g., JavaScript, React)",
-    type: "text",
-    componentType: "input",
-    required: false, // Tags are optional
+    type: "select",
+    componentType: "select",
+    required: true,
   },
   {
     name: "attachments",
     label: "Attachments",
     placeholder: "Add any related files",
     type: "file",
-    componentType: "input", // This could allow multiple files
+    componentType: "input",
     required: false,
   },
   {
@@ -181,8 +182,7 @@ export const SampleQuestionData = [
   },
   {
     title: "What is the difference between var, let, and const in JavaScript?",
-    description:
-      "I understand that var, let, and const are used for variable declarations in JavaScript, but I am confused about the differences between them. Could someone explain when to use each one?",
+    description: "I understand that var, let, and const are used for v?",
     category: "JavaScript",
     tags: ["JavaScript", "Programming", "Variables"],
     attachments: [],
