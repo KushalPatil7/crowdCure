@@ -15,7 +15,7 @@ function AnimatedGlobe() {
 
 const Home = () => {
   return (
-    <div className=" mx-auto px-4 py-12 h-[80] flex flex-col justify-center items-center">
+    <div className=" mx-auto px-4 py-12 h-full flex flex-col justify-center items-center">
       {/* Animated Globe Section */}
       <section className="text-center mb-6">
         <AnimatedGlobe />
@@ -36,6 +36,8 @@ const Home = () => {
           </button>
         </div>
       </section>
+
+      
     </div>
   );
 };

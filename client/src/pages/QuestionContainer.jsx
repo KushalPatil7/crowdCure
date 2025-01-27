@@ -26,13 +26,15 @@ const QuestionContainer = () => {
     developmentLanguages.map((lang) => ({ value: lang.id, label: lang.label }))
   );
 
+  // Handle input changes (including multi-select)
   const handleInputChange = (name, value) => {
     setFormData({
       ...formData,
-      [name]: value,
+      [name]: value, // For multi-select, this will be an array of selected options
     });
   };
 
+  // Handle file input changes
   const handleFileChange = (e) => {
     setFormData({
       ...formData,
@@ -40,22 +42,26 @@ const QuestionContainer = () => {
     });
   };
 
+  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     const newQuestion = {
       ...formData,
-      tags: formData.tags.map((tag) => tag.value),
-      category: formData.category.map((cat) => cat.value),
+      tags: formData.tags.map((tag) => tag.value), // Ensure we map tags to their 'value' fields
+      category: formData.category.map((cat) => cat.value), // Ensure we map categories to their 'value' fields
       attachments: Array.from(formData.attachments || []),
     };
 
+    // Add new question to the list and reset the form
     setQuestions([...questions, newQuestion]);
-    setFormData(initialQuestionData);
-    setShowModal(false);
+    setFormData(initialQuestionData); // Reset to initial form state
+    setShowModal(false); // Close the modal after submission
   };
 
+  // Close the modal
   const handleCloseModal = () => {
     setShowModal(false);
+    setFormData(initialQuestionData); // Reset the form when closing
   };
 
   return (
@@ -114,7 +120,7 @@ const QuestionContainer = () => {
                               ? categoryOptions
                               : tagOptions
                           }
-                          value={formData[control.name]}
+                          value={formData[control.name]} // Multi-select value
                           onChange={(selectedOptions) =>
                             handleInputChange(control.name, selectedOptions)
                           }

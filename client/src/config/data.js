@@ -6,7 +6,7 @@ import { MdPayment } from "react-icons/md";
 export const NavbarMenu = [
   {
     id: 1,
-    title: "Ask a Question",
+    title: "Doubts",
     link: "/question",
     icon: BsPatchQuestion,
   },
@@ -175,7 +175,7 @@ export const SampleQuestionData = [
     title: "How to implement a responsive navbar in React?",
     description:
       "I'm trying to build a responsive navbar in React, but I'm having trouble making it adapt to different screen sizes. What is the best way to implement a responsive navbar using React?",
-    category: "Web Development",
+    categories: ["Web Development"],
     tags: ["React", "JavaScript", "CSS", "Frontend"],
     attachments: [],
     comment: "",
@@ -183,9 +183,15 @@ export const SampleQuestionData = [
   {
     title: "What is the difference between var, let, and const in JavaScript?",
     description: "I understand that var, let, and const are used for v?",
-    category: "JavaScript",
+    categories: ["JavaScript"],
     tags: ["JavaScript", "Programming", "Variables"],
     attachments: [],
     comment: "",
   },
 ];
+
+export const SampleUserBio = 
+  {
+    designations: ["Web Development"],
+    skills: ["React", "JavaScript", "CSS", "Frontend"],
+  }

@@ -1,14 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import SearchBar from "./components/SearchBar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import QuestionCard from "./components/QuestionCard";
 import UserAnswer from "./components/UserAnswer";
-import { SampleQuestionData } from "../config/data";
+import { SampleQuestionData, SampleUserBio } from "../config/data";
+import UserDetailsForm from "./components/UserDetailsForm";
 
 const Profile = () => {
+  const { designations, skills } = SampleUserBio;
   return (
     <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-start lg:justify-between px-6 py-12 max-w-7xl mx-auto">
-      <div className="w-full">
+      <div className="w-full  m-4">
         {/* Upper part of column */}
         {/* Profile Header */}
         <div className="flex items-center flex-col lg:flex-row lg:items-start gap-6 lg:gap-10 mb-10">
@@ -19,8 +21,38 @@ const Profile = () => {
           />
           <div className="text-center lg:text-left">
             <h2 className="text-3xl font-semibold text-gray-800">Username</h2>
-            <p className="text-lg text-gray-500">@Username</p>
+            <p className="text-2xl text-gray-500">@Username</p>
+
+            {/* Designations */}
+            <div className="mb-2">
+              <span className="text-xl  text-gray-500">Designations: </span>
+              {designations.map((designation, index) => (
+                <span
+                  key={index}
+                  className="inline-block bg-gray-200 text-gray-700 text-sm rounded-full px-2 py-1 mr-2 "
+                >
+                  {designation}
+                </span>
+              ))}
+            </div>
+
+            {/* Skills */}
+            <div className="mb-4">
+              <span className="text-lg  text-gray-500">Skills: </span>
+              {skills.map((skill, index) => (
+                <span
+                  key={index}
+                  className="inline-block bg-gray-200 text-gray-700 text-sm rounded-full px-2 py-1 mr-2 "
+                >
+                  {skill}
+                </span>
+              ))}
+            </div>
           </div>
+
+
+          {/* Organization */}
+
           {/* Align Edit Profile Button to the Right */}
           <div className="lg:ml-auto">
             <button className="bg-blue-600 text-white py-2 px-6 rounded-full font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all duration-300">
@@ -28,11 +60,12 @@ const Profile = () => {
             </button>
           </div>
         </div>
+        <UserDetailsForm />
 
         {/* Lower part of column (Content Sections) */}
         <div className="w-full flex flex-col gap-10 lg:flex-row lg:gap-16">
           <Tabs defaultValue="Questions" className="w-full">
-            <TabsList className="flex mb-4 gap-4" >
+            <TabsList className="flex mb-4 gap-4">
               <TabsTrigger
                 value="Questions"
                 className="text-lg font-semibold py-2 px-4 rounded-t-lg hover:bg-blue-500 hover:text-white focus:outline-none transition-all duration-300 ease-in-out"
