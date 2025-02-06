@@ -1,37 +1,50 @@
 import jwt from 'jsonwebtoken';
-import { OAuth2Client } from 'google-auth-library';
-import dotenv from 'dotenv';
+import User from '../models/User.js';
 
-dotenv.config();
+const auth = async (req, res, next) => {
+    try {
+        // Get token from header or cookies
+        const token = 
+            (req.headers?.authorization?.startsWith('Bearer ') && req.headers.authorization.split(' ')[1]) ||
+            req.headers?.['x-auth-token'] ||
+            req.cookies?.token;
+        
+        if (!token) {
+            return res.status(401).json({ msg: 'No token, authorization denied' });
+        }
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+        // Add token blacklist check
+        if (await isTokenBlacklisted(token)) {
+            return res.status(401).json({ msg: 'Token has been invalidated' });
+        }
 
-const authMiddleware = async (req, res, next) => {
-  const token = req.header('x-auth-token');
-  if (!token) {
-    return res.status(401).json({ msg: 'No token, authorization denied' });
-  }
+        // Add token expiration check
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (decoded.exp < Date.now() / 1000) {
+            return res.status(401).json({ msg: 'Token has expired' });
+        }
 
-  try {
-    let decoded;
-    if (token.startsWith('Bearer ')) {
-      // For OAuth tokens
-      const idToken = token.split(' ')[1];
-      const ticket = await client.verifyIdToken({
-        idToken,
-        audience: process.env.GOOGLE_CLIENT_ID,
-      });
-      const payload = ticket.getPayload();
-      req.user = { id: payload.sub, email: payload.email };
-    } else {
-      // For JWT tokens
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = decoded.user;
+        // Get user from database
+        const user = await User.findById(decoded.user.id).select('-password');
+        if (!user) {
+            return res.status(401).json({ msg: 'User not found' });
+        }
+        
+        req.user = user;
+        next();
+    } catch (err) {
+        // Enhanced error handling
+        if (err.name === 'JsonWebTokenError') {
+            return res.status(401).json({ msg: 'Invalid token format' });
+        }
+        if (err.name === 'TokenExpiredError') {
+            return res.status(401).json({ msg: 'Token has expired' });
+        }
+        console.error('Auth middleware error:', err);
+        res.status(500).json({ msg: 'Internal server error during authentication' });
     }
-    next();
-  } catch (err) {
-    res.status(401).json({ msg: 'Token is not valid' });
-  }
 };
 
-export default authMiddleware;
+// Export as both default and named export
+export { auth };
+export default auth;

@@ -1,6 +1,7 @@
 import express from "express";
 import { check, validationResult } from "express-validator";
 import auth from '../middleware/auth.js';
+import checkRole from '../middleware/access.js';
 import Problem from '../models/Problem.js';
 import User from "../models/User.js";
 
@@ -9,32 +10,40 @@ const router = express.Router();
 // Create a new problem
 router.post(
   '/',
+  auth,
+  checkRole(['user', 'admin']),
   [
-    auth,
-    [
-      check('title', "Title is required").not().isEmpty(),
-      check('description', "Description is required").not().isEmpty(),
-    ]
+    check('title', "Title is required").not().isEmpty().trim(),
+    check('description', "Description is required").not().isEmpty().trim(),
+    check('category', 'Category is optional').optional().trim(),
+    check('tags', 'Tags is optional').optional().isArray(),
   ],
   async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
     try {
-      const user = await User.findById(req.user.id).select('-password');
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
 
-      const newProblem = new Problem({
-        title: req.body.title,
-        description: req.body.description,
+      // Sanitize and prepare data
+      const problemData = {
+        title: req.body.title.trim(),
+        description: req.body.description.trim(),
         createdBy: req.user.id,
-      });
+        category: req.body.category?.trim(),
+        tags: req.body.tags,
+        status: 'active'
+      };
 
+      const newProblem = new Problem(problemData);
       const problem = await newProblem.save();
-      res.status(201).json(problem); // Set status to 201
-    } catch (err) {
-      console.error(err.message);
-      res.status(500).send('Server error');
+      
+      // Populate creator info in response
+      await problem.populate('createdBy', ['name', 'email']);
+      res.status(201).json(problem);
+    } catch (error) {
+      console.error('Error:', error.message);
+      res.status(500).json({ msg: 'Server Error' });
     }
   }
 );
@@ -42,36 +51,49 @@ router.post(
 // Update a problem
 router.patch(
   '/:problemId',
-  auth,
   [
-    check('title', 'Title is optional').optional().not().isEmpty(),
-    check('description', 'Description is optional').optional().not().isEmpty(),
-    check('category', 'Category is optional').optional().not().isEmpty(),
-    check('tags', 'Tags should be an array').optional().isArray(),
-    check('status', 'Status is optional').optional().not().isEmpty(),
+    auth,
+    checkRole(['user', 'admin']),
+    [
+      check('title').optional().trim().notEmpty().withMessage('Title cannot be empty if provided'),
+      check('description').optional().trim().notEmpty().withMessage('Description cannot be empty if provided'),
+      check('category').optional().trim().notEmpty().withMessage('Category cannot be empty if provided'),
+      check('tags').optional().isArray().withMessage('Tags must be an array'),
+      check('status').optional().isIn(['active', 'resolved', 'pending']).withMessage('Invalid status'),
+    ]
   ],
   async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     try {
-      const problem = await Problem.findById(req.params.problemId);
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      // Sanitize update data
+      const updates = {};
+      if (req.body.title) updates.title = req.body.title.trim();
+      if (req.body.description) updates.description = req.body.description.trim();
+      if (req.body.category) updates.category = req.body.category.trim();
+      if (req.body.tags) updates.tags = req.body.tags;
+      if (req.body.status) updates.status = req.body.status;
+
+      // Use findOneAndUpdate for atomic operation
+      const problem = await Problem.findOneAndUpdate(
+        {
+          _id: req.params.problemId,
+          $or: [
+            { createdBy: req.user.id },
+            { $and: [{ role: 'admin' }] }
+          ]
+        },
+        { $set: updates },
+        { new: true, runValidators: true }
+      ).populate('createdBy', ['name', 'email']);
+
       if (!problem) {
-        return res.status(404).json({ msg: 'Problem not found' });
+        return res.status(404).json({ msg: 'Problem not found or unauthorized' });
       }
 
-      // Check if the user is authorized to update the problem
-      if (problem.createdBy.toString() !== req.user.id) {
-        return res.status(401).json({ msg: 'User not authorized' });
-      }
-
-      // Update fields
-      Object.assign(problem, req.body); // Update only provided fields
-
-      // Save the updated problem
-      await problem.save();
       res.json(problem);
     } catch (error) {
       console.error(error.message);
@@ -81,19 +103,14 @@ router.patch(
 );
 
 // Delete a problem
-router.delete('/:problemId', auth, async (req, res) => {
+router.delete('/:problemId', [auth, checkRole(['admin'])], async (req, res) => {
   try {
     const problem = await Problem.findById(req.params.problemId);
     if (!problem) {
       return res.status(404).json({ msg: 'Problem not found' });
     }
 
-    // Check if the user is authorized to delete the problem
-    if (problem.createdBy.toString() !== req.user.id) {
-      return res.status(401).json({ msg: 'User not authorized' });
-    }
-
-    // Remove the problem
+    // Only admins can delete problems
     await problem.remove();
     res.json({ msg: 'Problem removed' });
   } catch (error) {
@@ -102,8 +119,8 @@ router.delete('/:problemId', auth, async (req, res) => {
   }
 });
 
-// Get all problems - now restricted to authenticated users
-router.get('/', async (req, res) => {
+// Get all problems
+router.get('/', [auth, checkRole(['admin', 'user'])], async (req, res) => {
   try {
     const problems = await Problem.find().sort({ createdAt: -1 }).populate('createdBy', ['name', 'email']);
     res.json(problems);

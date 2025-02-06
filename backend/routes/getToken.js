@@ -5,10 +5,8 @@ import express from 'express';
 
 // Define the scopes required for the Google Calendar API
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
-const CREDENTIALS_PATH = path.resolve("./credentials.json");
-const TOKEN_PATH = path.resolve(
-  "./token.json"
-);
+const CREDENTIALS_PATH = path.resolve('../credentials.json');
+const TOKEN_PATH = path.resolve('../token.json');
 
 const router = express.Router();
 
