@@ -1,40 +1,57 @@
-import { asyncHandler } from "../utils/asyncHandler";
-import {ApiError} from "../utils/ApiError";
-import {User} from "../models/user.model.js";
-import {ApiResponse} from "../utils/ApiResponse";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import {ApiError} from "../utils/ApiError.js";
+import {User} from "../model/user.model.js";
+import {ApiResponse} from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 
-const registerUser=asyncHandler(async(req,res)=>{
-    const {fullname,username,email,password}=req.body;
+const generateAccessAndRefreshToken = async (userId) => {
+    try {
+      const user = await User.findById(userId);
+      const accessToken = user.generateAccessToken();
+      const refreshToken = user.generateRefreshToken();
+      user.refreshToken = refreshToken;
+  
+      await user.save({ validateBeforeSave: false });
+      return { accessToken, refreshToken };
+    } catch (error) {
+      throw new ApiError(
+        500,
+        "Something went wrong while generating refresh and access token"
+      );
+    }
+  };
 
-    if(!fullname|| !username || !email || !password){
-        return new ApiError(400,"All fields are required")
+const registerUser=asyncHandler(async(req,res)=>{
+    const {fullName,userName,email,password}=req.body;
+
+    if(!fullName|| !userName || !email || !password){
+        throw new ApiError(400,"All fields are required")
 
     }
-    const existedUser=User.findOne({
-        $or:[{username:username.toLowerCase()},{email}]
+    const existedUser=await User.findOne({
+        $or:[{userName:userName.toLowerCase()},{email}]
     })
     if(existedUser){
-        return new ApiError(409,"User already exists")
+        throw new ApiError(409,"User already exists")
 
     }
     const user=await User.create({
-        fullname,
+        fullName,
         email,
-        username:username.toLowerCase(),
+        userName:userName.toLowerCase(),
         password
     })
     return res
     .status(201)
-    .json(new ApirResponse(201,user,"User registered successfully"))
+    .json(new ApiResponse(201,user,"User registered successfully"))
 })
 const loginUser=asyncHandler(async(req,res)=>{
-    const {username,email,password}=req.body;
-    if((!username || !email)&& !password){
+    const {userName,email,password}=req.body;
+    if((!userName || !email)&& !password){
         throw new ApiError(400,"All fields are required")
     }
     const user=await User.findOne({
-        $or:[{username},{email}]
+        $or:[{userName},{email}]
     })
     if(!user){
         throw new ApiError(404,"User not found")
@@ -80,15 +97,15 @@ const logoutUser=asyncHandler(async(req,res)=>{
    .status(200)
    .clearCookie("accessToken",options)
    .clearCookie("refreshToken",options)
-
+    .json(new ApiResponse(200,{},"User logged out successfully"))
 })
 
 const updateUserInfo=asyncHandler(async(req,res)=>{
-    const {fullname,username, bio}=req.body;
-   const user=await User.findByIdAndUpdate(req.user?._id,{
+    const {fullName,userName, bio}=req.body;
+    const user=await User.findByIdAndUpdate(req.user?._id,{
     $set:{
-        fullname,
-        username:username,
+        fullName,
+        userName:userName,
         bio:bio
     },
    }).select('-password -refreshToken')
@@ -97,13 +114,26 @@ const updateUserInfo=asyncHandler(async(req,res)=>{
    .json(new ApiResponse(200,user,"User details updated successfully"))
 })
 
-const getUser=asyncHandler(async(req,res)=>{
-    const user=await User.findById(req.user?._id)
+const getUser = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    if (!id) {
+        throw new ApiError(400, "User ID is required");
+    }
+
+    // Select only public fields
+    const user = await User.findById(id)
+        .select("fullName userName bio collaborations questions createdAt")
+        .populate('collaborations', 'title description')
+        .populate('questions', 'title content');
+
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
     return res
-    .status(200)
-    .json(new ApiResponse(200,user,"User fetched Successfully"))
-})
-
-
+        .status(200)
+        .json(new ApiResponse(200, user, "User profile fetched Successfully"));
+});
 
 export {registerUser,loginUser,logoutUser,updateUserInfo,getUser}

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
-import Project from './project.model.js'
+import {Project} from './project.model.js'
 import { Question } from './question.model.js';
 const userSchema= new mongoose.Schema({
     fullName:{
@@ -77,5 +77,5 @@ userSchema.pre("save", async function (next) {
   };
 
 
-const User=mongoose.model('User',userSchema)
-export default User
+const User=mongoose.model("User",userSchema)
+export {User}

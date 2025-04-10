@@ -1,6 +1,4 @@
 import mongoose from "mongoose";
-import User from "./user.model";
-import Discussion from "./discussion.model";
 
 const ProjectSchema = new mongoose.Schema(
   {
@@ -16,31 +14,38 @@ const ProjectSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    owner: { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: User, 
-      required: true 
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
-    repoLink: { 
+    repoLink: {
       type: String,
-      required:true
+      required: true,
     },
-    
-    members: [{ 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: User
-    }],
-    joinRequests: [{ 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: User
-    }],
-    discussions: [{ 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref:Discussion
-    }],
+    members: [
+      {
+        user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        role: {
+          type: String,
+          enum: ["member", "maintainer"],
+          default: "member",
+        },
+      },
+    ],
+    joinRequests: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   { timestamps: true }
 );
-Project.createIndex({ name: "text", description: "text" });
+
+// Add index for text search
+ProjectSchema.index({ title: "text", description: "text" });
+
 const Project = mongoose.model("Project", ProjectSchema);
-export default Project;
+
+export { Project };

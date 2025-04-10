@@ -1,26 +1,26 @@
 import mongoose, { Mongoose } from "mongoose";
 
-const questionSchema=new Mongoose.Schema({
+const questionSchema=new mongoose.Schema({
     title:{
-        type:string,
+        type:String,
         required:true,
 
     },
     description:{
-        type:string,
+        type:String,
         required:true,
     },
     tags:{
-        type:string,
+        type:String,
         
     },
     user:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:User
+        ref:'User'
     },
     answer:[{
-        type:mongoose.Scheam.Types.ObjectId,
-        ref:Answer
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Answer'
     }]
 
 },{timestamps:true})

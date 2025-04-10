@@ -1,9 +1,9 @@
-import { asyncHandler } from "../utils/asyncHandler";
-import { ApiError } from "../utils/ApiError";
-import { ApiResponse } from "../utils/ApiResponse";
-import { Project } from "../models/project.model.js";
-import { Discussion } from "../models/discussion.model.js";
-import { User } from "../models/user.model.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { Project } from "../model/project.model.js";
+import { Discussion } from "../model/discussion.model.js";
+import { User } from "../model/user.model.js";
 
 /**
  * Create a new project
@@ -27,19 +27,24 @@ const createProject = asyncHandler(async (req, res) => {
  */
 const updateProject = asyncHandler(async (req, res) => {
   const { title, description, overview, repoLink } = req.body;
-  const userId = req.user._id;
-  const project = await Project.findById(req.params.id);
+  const userId = req.user.id;
+  const { id } = req.params;
+  if(!id){
+    throw new ApiError(400, "Project ID is required");
+  }
+  const project=await Project.findById(id);
+  
 
   if (!project) {
     throw new ApiError(404, "Project not found");
   }
 
-  if (String(project.owner) !== String(userId)) {
+  if (String(project.owner) !== userId) {
     throw new ApiError(403, "You are not allowed to update this project");
   }
 
   const updatedProject = await Project.findByIdAndUpdate(
-    req.params.id,
+    id,
     { $set: { title, description, overview, repoLink } },
     { new: true }
   );
@@ -51,10 +56,14 @@ const updateProject = asyncHandler(async (req, res) => {
  * Get a project by ID
  */
 const getProjectById = asyncHandler(async (req, res) => {
+  const {id}=req.params;
+  if(!id){
+    throw new ApiError(400, "Project ID is required");
+  }
   const project = await Project.findById(req.params.id)
     .populate("owner", "name email")
     .populate("members", "name email")
-    .populate("discussions");
+    
 
   if (!project) {
     throw new ApiError(404, "Project not found");
@@ -91,30 +100,70 @@ const deleteProject = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, null, "Project deleted successfully"));
 });
 
-/**
- * Add a member to the project
- */
-const addMember = asyncHandler(async (req, res) => {
-  const { userId } = req.body;
-  const project = await Project.findById(req.params.id);
+const sendJoinRequest = asyncHandler(async (req, res) => {
+  const { userId } = req.user;
+  const { id } = req.params;
+  if(!id){
+    throw new ApiError(400, "Project ID is required");
+  }
+  const project = await Project.findById(id);
+  if (!project) {
+    throw new ApiError(404, "Project not found");
+  }
+  if (project.joinRequests.includes(userId)) {
+    throw new ApiError(400, "Join request already sent");
+  }
+  project.joinRequests.push(userId);
+  await project.save();
+  return res.status(200).json(new ApiResponse(200, project, "Join request sent successfully"));
 
+})
+
+const handleJoinRequest = asyncHandler(async (req, res) => {
+  const { userId, action } = req.body; // user to accept/reject and the action
+  const projectId = req.params.projectId;
+  const ownerId = req.user._id;
+
+  const project = await Project.findById(projectId);
   if (!project) {
     throw new ApiError(404, "Project not found");
   }
 
-  if (String(project.owner) !== String(req.user._id)) {
-    throw new ApiError(403, "Only the project owner can add members");
+  if (project.owner.toString() !== ownerId.toString()) {
+    throw new ApiError(403, "Only project owner can manage join requests");
   }
 
-  if (project.members.includes(userId)) {
-    throw new ApiError(400, "User is already a member of the project");
+  const isRequested = project.joinRequests.includes(userId);
+  if (!isRequested) {
+    throw new ApiError(400, "User has not requested to join");
   }
 
-  project.members.push(userId);
+  if (action === "accept") {
+    
+    if (!project.members.includes(userId)) {
+      project.members.push(userId);
+    }
+  }
+
+  // Remove from joinRequests either way
+  project.joinRequests = project.joinRequests.filter(
+    (id) => id.toString() !== userId.toString()
+  );
+
   await project.save();
+  const message = action === "accept"
+  ? "User accepted and added to the project"
+  : "User's join request rejected";
 
-  return res.status(200).json(new ApiResponse(200, project, "Member added successfully"));
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      project,
+      message
+    )
+  );
 });
+
 
 /**
  * Remove a member from the project
@@ -152,32 +201,32 @@ const getUserProjects = asyncHandler(async (req, res) => {
 /**
  * Start a discussion in a project
  */
-const startDiscussion = asyncHandler(async (req, res) => {
-  const { message } = req.body;
-  const userId = req.user._id;
-  const project = await Project.findById(req.params.id);
+// const startDiscussion = asyncHandler(async (req, res) => {
+//   const { message } = req.body;
+//   const userId = req.user._id;
+//   const project = await Project.findById(req.params.id);
 
-  if (!project) {
-    throw new ApiError(404, "Project not found");
-  }
+//   if (!project) {
+//     throw new ApiError(404, "Project not found");
+//   }
 
-  const discussion = await Discussion.create({
-    project: req.params.id,
-    user: userId,
-    message,
-  });
+//   const discussion = await Discussion.create({
+//     project: req.params.id,
+//     user: userId,
+//     message,
+//   });
 
-  return res.status(201).json(new ApiResponse(201, discussion, "Discussion started successfully"));
-});
+//   return res.status(201).json(new ApiResponse(201, discussion, "Discussion started successfully"));
+// });
 
 /**
  * Get discussions for a project
  */
-const getProjectDiscussions = asyncHandler(async (req, res) => {
-  const discussions = await Discussion.find({ project: req.params.id }).populate("user", "name email");
+// const getProjectDiscussions = asyncHandler(async (req, res) => {
+//   const discussions = await Discussion.find({ project: req.params.id }).populate("user", "name email");
 
-  return res.status(200).json(new ApiResponse(200, discussions, "Discussions fetched successfully"));
-});
+//   return res.status(200).json(new ApiResponse(200, discussions, "Discussions fetched successfully"));
+// });
 
 export {
   createProject,
@@ -185,9 +234,8 @@ export {
   getProjectById,
   getAllProjects,
   deleteProject,
-  addMember,
+  sendJoinRequest,
+  handleJoinRequest,
   removeMember,
-  getUserProjects,
-  startDiscussion,
-  getProjectDiscussions,
+  getUserProjects
 };

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { Question } from "./question.model";
+import { Question } from "./question.model.js";
 
 const answerSchema=new mongoose.Schema({
     
@@ -7,12 +7,12 @@ const answerSchema=new mongoose.Schema({
         type:String,
     },
     user:{
-        type:mongoose.Schema.types.ObjectId,
-        ref:User
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'User'
     },
     question:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:Question
+        ref:'Question'
     }
 },{timestamps:true})
 

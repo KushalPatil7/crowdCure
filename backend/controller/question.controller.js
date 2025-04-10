@@ -1,9 +1,9 @@
-import { asyncHandler } from "../utils/asyncHandler";
-import { ApiError } from "../utils/ApiError";
-import { ApiResponse } from "../utils/ApiResponse";
-import { Project } from "../models/project.model.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 
-import { User } from "../models/user.model.js";
+
+import { User } from "../model/user.model.js";
 import { Question } from "../model/question.model.js";
 
 const createQuestion = asyncHandler(async (req, res) => {

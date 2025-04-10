@@ -20,4 +20,4 @@ const searchService=asyncHandler(async (req, res) => {
     }
 })
 
-export {searchService}
+export {searchService};

@@ -23,4 +23,4 @@ const DiscussionSchema = new mongoose.Schema({
     
 },{timestamps:true});
 const Discussion=mongoose.model('Discussion',DiscussionSchema);
-export default Discussion
+export { Discussion}
