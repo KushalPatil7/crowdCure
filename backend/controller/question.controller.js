@@ -12,12 +12,14 @@ const createQuestion = asyncHandler(async (req, res) => {
   if (!title || !description) {
     throw new ApiError(400, "All fields are required");
   }
-  const question = create({ title, description, tags, attachment, user });
-  await question.save();
+
+  const question = await Question.create({ title, description, tags, attachment, user });
+
   return res
     .status(200)
     .json(new ApiResponse(200, question, "Question created successfully"));
 });
+
 
 const updateQuestion = asyncHandler(async (req, res) => {
     const { title, description, tags } = req.body;
@@ -65,5 +67,14 @@ const getQuestion=asyncHandler(async(req,res)=>{
     return res.status(200).json(new ApiResponse(200,question,"Question fetched successfully"));
 
 })
+const getAllQuestions=asyncHandler(async(req,res)=>{
+  try {
+    const questions = await Question.find().populate('createdBy', 'name');
+    return res.status(200).json(new ApiResponse(200, questions, "Questions fetched successfully"));
+  } catch (err) {
+    res.status(500).json({ error: 'Something went wrong' });
+  }
+});
 
-export { createQuestion, updateQuestion, deleteQuestion,getQuestion };
+
+export { createQuestion, updateQuestion, deleteQuestion,getQuestion, getAllQuestions };

@@ -10,10 +10,10 @@ const questionSchema=new mongoose.Schema({
         type:String,
         required:true,
     },
-    tags:{
+    tags:[{
         type:String,
         
-    },
+    }],
     user:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User'
