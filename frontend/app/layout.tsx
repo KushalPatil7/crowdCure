@@ -11,7 +11,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata = {
   title: "CrowdCure",
   description: "Solve Problems. Collaborate on Projects.",
-    generator: 'v0.dev'
+    generator: 'KP'
 }
 
 export default function RootLayout({
@@ -20,9 +20,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100`}>
+    <html lang="en" suppressHydrationWarning={true}>
+      <body suppressHydrationWarning className={`${inter.className}  text-gray-900 dark:text-gray-100`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          
           <div className="flex min-h-screen">
             <Sidebar />
             <div className="flex-1 ml-16">

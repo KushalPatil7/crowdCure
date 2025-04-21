@@ -69,7 +69,8 @@ const getQuestion=asyncHandler(async(req,res)=>{
 })
 const getAllQuestions=asyncHandler(async(req,res)=>{
   try {
-    const questions = await Question.find().populate('createdBy', 'name');
+    const questions = await Question.find().populate('user', 'name');
+
     return res.status(200).json(new ApiResponse(200, questions, "Questions fetched successfully"));
   } catch (err) {
     res.status(500).json({ error: 'Something went wrong' });

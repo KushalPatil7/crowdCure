@@ -1,9 +1,49 @@
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import QuestionCard from "@/components/QuestionCard"
-import Link from "next/link"
+"use client";
+
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import QuestionCard from "@/components/QuestionCard";
+import { getAllQuestions } from "../api/question.js";
+import Link from "next/link";
+
+interface Question {
+  _id: string;
+  title: string;
+  description: string;
+  tags: string[]; // Assuming tags are already an array
+  votes: number;
+  answer: any[]; // Assuming answers are an array
+}
 
 export default function QAPage() {
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      setLoading(true);
+      try {
+        const response = await getAllQuestions();
+        console.log("Fetched questions:", response.data); // response.data is your array
+        setQuestions(response.data); // ✅ Assign only the array
+      } catch (error) {
+        console.error("Error fetching questions:", error);
+        setError("Failed to load questions. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+
+    fetchQuestions();
+  }, []);
+
+  if (loading) {
+    return <div>Loading questions...</div>;
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
@@ -17,36 +57,21 @@ export default function QAPage() {
         <Input placeholder="Search questions..." className="max-w-3xl" />
       </div>
 
+      {error && <div className="text-red-500 mb-4">{error}</div>}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <QuestionCard
-          title="How to optimize React performance?"
-          description="I'm working on a large React application and noticing some performance issues. What are some best practices for optimizing React apps?"
-          tags={["react", "performance", "optimization"]}
-          votes={42}
-          answers={15}
-        />
-        <QuestionCard
-          title="Best practices for API security?"
-          description="I'm building a RESTful API and want to ensure it's secure. What are some essential security measures I should implement?"
-          tags={["api", "security", "best-practices"]}
-          votes={38}
-          answers={12}
-        />
-        <QuestionCard
-          title="Machine Learning for image recognition"
-          description="I'm new to ML and want to build an image recognition model. Where should I start and what libraries are recommended?"
-          tags={["machine-learning", "image-recognition", "python"]}
-          votes={56}
-          answers={23}
-        />
-        <QuestionCard
-          title="Implementing WebSockets in Node.js"
-          description="I need to add real-time functionality to my Node.js application. What's the best way to implement WebSockets?"
-          tags={["node.js", "websockets", "real-time"]}
-          votes={29}
-          answers={8}
-        />
+        {questions.map((q) => (
+          <QuestionCard
+            _id={q._id}
+            key={q._id}
+            title={q.title}
+            description={q.description}
+            tags={q.tags || []}  // Assuming tags is an array already
+            votes={q.votes || 0}  // Assuming votes is part of the question
+            answers={q.answer || []}
+          />
+        ))}
       </div>
     </div>
-  )
+  );
 }

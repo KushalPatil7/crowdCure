@@ -51,6 +51,7 @@ export default function Home() {
             members={8}
           />
           <CollaborationCard
+          
             title="AI-powered personal finance app"
             description="Join us in creating an innovative personal finance app that uses AI to provide personalized advice and insights."
             skills={["Python", "Machine Learning", "React Native"]}

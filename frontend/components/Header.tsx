@@ -1,9 +1,10 @@
 "use client"
 
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react"
 import { Bell, Search, User } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,10 +14,46 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useState } from "react"
 
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [userInitials, setUserInitials] = useState("U")
+
+  useEffect(() => {
+    // Check if accessToken exists in localStorage instead of token
+    const accessToken = localStorage.getItem("accessToken")
+    
+    if (accessToken) {
+      setIsLoggedIn(true)
+      
+      // Try to get user info from localStorage if available
+      try {
+        const userData = JSON.parse(localStorage.getItem("userData") || '{}')
+        if (userData.fullName) {
+          // Extract initials from full name
+          const nameParts = userData.fullName.split(" ")
+          const initials = nameParts.map((part:string) => (part)[0]).join("").toUpperCase()
+          setUserInitials(initials || "U")
+        }
+      } catch (err) {
+        console.error("Error parsing user data", err)
+        setUserInitials("U")
+      }
+    } else {
+      setIsLoggedIn(false)
+    }
+  }, [])
+
+  const handleLogout = () => {
+    // Remove both tokens
+    localStorage.removeItem("accessToken")
+    localStorage.removeItem("refreshToken")
+    localStorage.removeItem("userData")
+    
+    setIsLoggedIn(false)
+    // Redirect to home
+    window.location.href = "/"
+  }
 
   return (
     <header className="border-b dark:border-gray-800 sticky top-0 bg-white dark:bg-gray-900 z-10">
@@ -34,52 +71,40 @@ export default function Header() {
         </div>
 
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-0 right-0 w-2 h-2 bg-orange-500 rounded-full"></span>
-          </Button>
-
           {isLoggedIn ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src="/placeholder.svg" alt="User" />
-                    <AvatarFallback>JD</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Link href="/profile" className="w-full">
-                    Profile
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link href="/settings" className="w-full">
-                    Settings
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setIsLoggedIn(false)}>Log out</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Button
-              variant="ghost"
-              className="relative h-8 w-8 rounded-full p-0 flex items-center justify-center"
-              onClick={() => setIsLoggedIn(true)}
-            >
-              <User className="h-5 w-5" />
-            </Button>
-          )}
+            <>
+              <Button variant="ghost" size="icon" className="relative">
+                <Bell className="w-5 h-5" />
+                <span className="absolute top-0 right-0 w-2 h-2 bg-orange-500 rounded-full"></span>
+              </Button>
 
-          {!isLoggedIn && (
-            <Button asChild onClick={() => setIsLoggedIn(true)}>
-              <Link href="/auth">Login</Link>
-            </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src="/placeholder.svg" alt="User" />
+                      <AvatarFallback>{userInitials}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <Link href="/profile">Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href="/settings">Settings</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          ) : (
+            <Link href="/auth">
+              <Button variant="outline">Login / Register</Button>
+            </Link>
           )}
         </div>
       </div>

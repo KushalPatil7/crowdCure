@@ -2,12 +2,19 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Badge } from "@/components/ui/badge"
 import { ArrowUpCircle, MessageCircle } from "lucide-react"
 
+// Define the Answer interface if answers are more than just strings
+interface Answer {
+  text: string
+  userId: string
+}
+
 interface QuestionCardProps {
+  _id: string
   title: string
   description: string
   tags: string[]
   votes: number
-  answers: number
+  answers: any[] // Use Answer[] if answers are complex objects
 }
 
 export default function QuestionCard({ title, description, tags, votes, answers }: QuestionCardProps) {
@@ -33,7 +40,7 @@ export default function QuestionCard({ title, description, tags, votes, answers 
         </div>
         <div className="flex items-center">
           <MessageCircle className="w-4 h-4 mr-1" />
-          <span>{answers} answers</span>
+          <span>{answers.length} answers</span> {/* Display the number of answers */}
         </div>
       </CardFooter>
     </Card>
