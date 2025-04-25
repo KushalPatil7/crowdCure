@@ -16,6 +16,14 @@ interface CollaborationCardProps {
   onJoinClick?: () => void
 }
 
+// ✅ Helper function above the component
+function getTimeAgo(dateString: string): string {
+  const date = new Date(dateString);
+  return isNaN(date.getTime())
+    ? "unknown time"
+    : `${formatDistanceToNow(date)} ago`;
+}
+
 export default function CollaborationCard({ 
   id, 
   title, 
@@ -50,7 +58,7 @@ export default function CollaborationCard({
         </div>
         <div className="flex items-center text-sm text-gray-500 mt-2">
           <Calendar className="w-4 h-4 mr-1" />
-          <span>Created {formatDistanceToNow(new Date(createdAt))} ago</span>
+          <span>Created {getTimeAgo(createdAt)}</span>
         </div>
       </CardHeader>
       <CardContent className="flex-grow">

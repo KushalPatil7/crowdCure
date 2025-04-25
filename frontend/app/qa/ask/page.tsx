@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { X, Upload, Eye } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-
+import { createQuestion } from "../../api/question.js" // Adjust the import based on your API function location
 export default function AskQuestionPage() {
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
@@ -40,6 +40,27 @@ export default function AskQuestionPage() {
   const filteredSuggestions = suggestedTags.filter(
     (tag) => tag.includes(tagInput.toLowerCase()) && !tags.includes(tag) && tagInput !== "",
   )
+  const handleSubmit = async () => {
+    const questionData = {
+      title,
+      description,
+      category,
+      tags
+    }
+
+    try {
+      const result = await createQuestion(questionData)
+      console.log("Question created successfully:", result)
+      // You can add navigation here or reset form
+      setTitle("")
+      setDescription("")
+      setCategory("")
+      setTags([])
+      alert("Question posted successfully!")
+    } catch (err) {
+      alert(err)
+    }
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -189,9 +210,14 @@ export default function AskQuestionPage() {
             <Button variant="outline" className="mr-2">
               Save as Draft
             </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white" disabled={!title || !description || !category}>
+            <Button
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+              disabled={!title || !description || !category}
+              onClick={handleSubmit}
+            >
               Post Question
             </Button>
+
           </div>
         </div>
 
