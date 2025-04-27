@@ -3,6 +3,7 @@ import {ApiError} from "../utils/ApiError.js";
 import {User} from "../model/user.model.js";
 import {ApiResponse} from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 const generateAccessAndRefreshToken = async (userId) => {
     try {
@@ -114,26 +115,30 @@ const updateUserInfo=asyncHandler(async(req,res)=>{
    .json(new ApiResponse(200,user,"User details updated successfully"))
 })
 
-const getUser = asyncHandler(async (req, res) => {
+const getUser = async (req, res, next) => {
+  try {
     const { id } = req.params;
 
-    if (!id) {
-        throw new ApiError(400, "User ID is required");
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new ApiError(400, "Invalid user ID format");
     }
 
-    // Select only public fields
-    const user = await User.findById(id)
-        .select("fullName userName bio collaborations questions createdAt")
-        .populate('collaborations', 'title description')
-        .populate('questions', 'title content');
-
+    const user = await User.findById(id);
     if (!user) {
-        throw new ApiError(404, "User not found");
+      throw new ApiError(404, "User not found");
     }
 
-    return res
-        .status(200)
-        .json(new ApiResponse(200, user, "User profile fetched Successfully"));
-});
+    res.status(200).json({
+      success: true,
+      data: user
+    });
+    
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+
 
 export {registerUser,loginUser,logoutUser,updateUserInfo,getUser}

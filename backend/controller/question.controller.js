@@ -1,11 +1,20 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-
-
 import { User } from "../model/user.model.js";
 import { Question } from "../model/question.model.js";
+import { get } from "mongoose";
 
+
+const getQuestionsByUser = async (userId) => {
+  try {
+    const questions = await Question.find({ user: userId }).populate('answer'); // populate the 'answer' field if needed
+    return questions;
+  } catch (error) {
+    console.error("Error fetching questions by user:", error);
+    throw error; // or handle it as necessary
+  }
+};
 const createQuestion = asyncHandler(async (req, res) => {
   const { title, description, tags, attachment, user } = req.body;
 
@@ -77,5 +86,16 @@ const getAllQuestions=asyncHandler(async(req,res)=>{
   }
 });
 
+const getQuesofUser= asyncHandler(async(req,res)=>{
+  const {id}=req.params;
+  const user=await User.findById(id)
+  if(!user){
+    throw new ApiError(404,"User not found")
+  }
+  const ques=await getQuestionsByUser(id);
+  return res.status(200).json(new ApiResponse(200,ques,"Questions fetched successfully"));
 
-export { createQuestion, updateQuestion, deleteQuestion,getQuestion, getAllQuestions };
+})
+
+
+export { createQuestion, updateQuestion, deleteQuestion,getQuestion, getAllQuestions, getQuesofUser };
